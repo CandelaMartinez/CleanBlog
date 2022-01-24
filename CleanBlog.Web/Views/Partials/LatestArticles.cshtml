@@ -1,0 +1,151 @@
+﻿@using CleanBlog.Core.Helpers
+@*@inherits Umbraco.Web.Mvc.UmbracoViewPage*@ 
+@inherits CleanBlogViewPage
+
+@using CleanBlog.Core.Helpers
+@using CleanBlog.Core.ViewPages
+
+
+@{
+    //......................................................................................................................................
+    //accedo a la pagina blog del tipo article list
+    // var articleList = Model.Root().Descendants<ArticleList>().FirstOrDefault();
+
+    //opcion usando models builder: articles donde is visible, ordenador por la propiedad articleDate
+    //var articles = articleList.Descendants<Article>().Where(x => x.IsVisible()).OrderByDescending(y => y.ArticleDateP);
+
+    ////sin usar models buider, query donde pido los descendientes de raiz que tengan alias article y cuando esta el naviHide seteado en visible
+    ////var articles = Model.Root().Descendants().Where(x => x.ContentType.Alias == "article" && x.IsVisible());
+
+    //es articleList?
+    //var isArticleListPage = articleList.Id == Model.Id;
+
+    //si esta desplegado en una pagina que es articleList, page size es 10, si no es articleList renderiza 3
+    //var fallbackPageSize = isArticleListPage ? 10 : 3;
+
+    //query string de page para saber en que pagina estoy, default es 1
+    //var pageNumber =  QueryStringHelper.GetIntFromQueryString(Request,"page",1);
+
+    //query string de size: default: 10 si es article list, 3 si no lo es
+    //var pageSize = QueryStringHelper.GetIntFromQueryString(Request,"size", fallbackPageSize);
+
+    //var pageOfArticles= articles.Skip((pageNumber-1)*pageSize).Take(pageSize);
+
+    //paginacion
+    //var totalItemCount = articles.Count();
+    //paginacion: cantidad total de articulos es mayor a cero? entonces total/tamaño de pagina, si es menos a cero: la cantidad de paginas es 1
+    //var pageCount = totalItemCount > 0 ? Math.Ceiling((double)totalItemCount / pageSize) :1;
+    //.................................................................................................
+    //opcion usando articleList Service
+    var siteRoot = Model.Root();
+    var articleList =(ArticleList) ArticleService.GetArticleListPage(siteRoot);
+    var articles = ArticleService.GetLatestArticles(siteRoot).Cast<Article>();
+   
+    var isArticleListPage = articleList.Id == Model.Id;
+
+    var fallbackPageSize = isArticleListPage ? 10 : 3;
+
+    var pageNumber =  QueryStringHelper.GetIntFromQueryString(Request,"page",1);
+
+    var pageSize = QueryStringHelper.GetIntFromQueryString(Request,"size", fallbackPageSize);
+
+    var pageOfArticles= articles.Skip((pageNumber-1)*pageSize).Take(pageSize);
+
+    var totalItemCount = articles.Count();
+    var pageCount = totalItemCount > 0 ? Math.Ceiling((double)totalItemCount / pageSize) :1;
+
+}
+
+@if (articles != null && articles.Any())
+{
+
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+
+                @foreach (var article in pageOfArticles)
+                {
+
+                    <div class="post-preview">
+                        <!--el articulo es un link que me lleva a la url del articulo-->
+<a href="@article.Url">
+    <h2 class="post-title">
+        <!--si hay titulo en article, ponerlo, sino poner el nombre-->
+        @(!string.IsNullOrWhiteSpace(article.TitleP) ? article.TitleP : article.Name)
+
+    </h2>
+    <!--si hay subtitulo-->
+    @if (!string.IsNullOrWhiteSpace(article.SubtitleP))
+    {
+        <!--ponerlo-->
+        <h3 class="post-subtitle">
+            @article.SubtitleP
+        </h3>
+    }
+</a>
+<p class="post-meta">
+    <!--si hay nombre de autor-->
+    Posted
+    @if (!string.IsNullOrWhiteSpace(article.AuthorNameP))
+    {
+
+        @Html.Raw("by ") @article.AuthorNameP;
+
+    }
+    on @article.ArticleDateP
+
+
+</p>
+                    </div>
+<hr>
+
+}
+
+<!-- Pager: si estoy en una articleList page y la cantidad de paginas es mas que 1, muestro la paginacion, sino muestro el link a la pagina articleList-->
+
+<div id="paging" class="clearfix">
+    @if (isArticleListPage)
+    {
+        if (pageCount > 1)
+        {
+            <!--previous-->
+            <div class="paging-block">
+                @if (pageNumber > 1)
+                {
+                <a class="btn btn-primary float-left" href="@($"{articleList.Url}?page={pageNumber - 1}&size={pageSize}")">@Umbraco.GetDictionaryValue("Blog.Prev")</a>
+                }
+                else
+                {
+                    @Html.Raw("&nbsp;")
+                }
+            </div>
+
+            <!--numeracion-->
+            <div class="paging-block text-center">
+                <span>Page @pageNumber of @pageCount</span>
+            </div>
+
+            <!--next-->
+            <div class="paging-block">
+                @if (pageNumber < pageCount)
+                {
+                <a class="btn btn-primary float-right" href="@($"{articleList.Url}?page={pageNumber + 1}&size={pageSize}")">@Umbraco.GetDictionaryValue("Blog.Next")</a>
+                }
+                else
+                {
+                    @Html.Raw("&nbsp;")
+                }
+            </div>
+
+        }
+    }
+    else
+    {
+        <a class="btn btn-primary float-right" href="@(articleList.Url)">@Umbraco.GetDictionaryValue("Blog.ViewAll")</a>
+    }
+</div>
+            </div>
+        </div>
+    </div>
+
+}

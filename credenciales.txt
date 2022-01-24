@@ -1,0 +1,9 @@
+CleanBlog.Web
+Umbraco 8
+db: CleanBlog
+id user: cleanblog_dev
+2323232323
+
+Umbraco backoffice:
+admin@admin.com
+2323232323

@@ -1,0 +1,80 @@
+﻿@inherits  UmbracoViewPage
+@{ 
+    //si el modelo tiene un valor para title o subtitle (todas las propiedades) usarlo, sino usar Model.Name
+    var title = Model.HasValue("titleP") ? Model.Value("titleP") : Model.Name;
+    var subtitle= Model.HasValue("subtitleP") ? Model.Value<string>("subtitleP") : Model.Name;
+    var image = Model.Value<IPublishedContent>("mainImageP");
+
+    //si el modelo tiene la propiedad y si tiene el value, usarla, sino dejarla en blanco
+    var authorName = Model.HasValue("authorNameP") && Model.HasValue("authorNameP") ? Model.Value<string>("authorNameP") : "";
+    //si el modelo tiene la propiedad y si tiene el value, usarla, sino setearla como minValue
+    DateTime articleDate = Model.HasValue("articleDateP") && Model.HasValue("articleDateP") ? Model.Value<DateTime>("articleDateP") : DateTime.MinValue;
+
+
+    string imageUrl = "";
+    if(image != null)
+    {
+        imageUrl = image.GetCropUrl(1903, 532);
+    }
+
+
+    //bool true si authorName tiene value o si articleDate no es MinValue
+    bool hasAuthorDetails = !string.IsNullOrWhiteSpace(authorName) || articleDate != DateTime.MinValue;
+}
+
+<!-- Page Header-->
+<!--si tiene valor imageUrl, cargar ese estilo, sino dejarlo null en background-image-->
+<header class="masthead" style="@(!string.IsNullOrWhiteSpace(imageUrl)? "background-image: url('"+ imageUrl +"')": null)">
+    <div class="container position-relative px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="site-heading">
+                    <h1>@title</h1>
+
+                    <!--si tiene titulo-->
+                    @if (!string.IsNullOrWhiteSpace(subtitle))
+                    {
+
+                        <!--si tiene article details, el subtitulo es un h2, sino es un span-->
+                        if (hasAuthorDetails)
+                        {
+                            <h2 class="subheading">@subtitle</h2>
+                        }
+                        else
+                        {
+
+                            <span class="subheading">@subtitle</span>
+
+                        }
+
+
+                    }
+
+                    <!--si tiene article details, desplegarlos-->
+                    @if (hasAuthorDetails)
+                    {
+
+
+                      <span class="meta">
+
+                          <!--si tiene autor, desplegarlo-->
+                            Posted 
+                            @if (!string.IsNullOrWhiteSpace(authorName))
+                            {
+
+                                @Html.Raw("by ") @authorName
+
+                            }
+                            
+                            <!--desplegar la fecha-->
+                                on @articleDate.ToString("MMMM dd,yyyy")
+                            
+                            
+                        </span>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

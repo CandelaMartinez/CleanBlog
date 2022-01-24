@@ -1,0 +1,74 @@
+﻿@using CleanBlog.Core.ViewModel
+@using CleanBlog.Core.Controllers
+
+
+<!--modelo que usa esta View-->
+@inherits UmbracoViewPage<ContactViewModel>
+<!--.................................................................................-->
+<div id="form-outer">
+    <!--controlador ContactSurface, metodo SubmitForm-->
+    @using (Ajax.BeginForm("SubmitForm", "ContactSurface", new AjaxOptions()
+    {
+        //cuando termine va al div form-result
+        UpdateTargetId = "form-result",
+        HttpMethod = "POST",
+        InsertionMode = InsertionMode.Replace,
+        //js: llamo al metodo showResult del archivo contactForm.js
+        OnSuccess = "contactForm.showResult",
+        OnFailure = "contactForm.showResult"
+
+
+        //paso el id para ser llamado desde contactForm.js
+    }, new { id = "contact-form" }))
+
+    //dentro del ajaxForm
+    {
+        <!--envia hidden este campo al contactFormViewModel-->
+        @Html.HiddenFor(m => m.ContactFormId)
+
+        <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+                <label for="name">Name</label>
+                <!--textbox usa el atributo nombre del modelo, usa Html para darle la clase form.control-->
+                @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Name" })
+                <!--validacion que traigo de Model-->
+                @Html.ValidationMessageFor(m => m.Name)
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+                <label for="name">Email Address</label>
+                <!--textbox usa el atributo nombre del modelo, usa Html para darle la clase form.control-->
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Email" })
+                <!--validacion que traigo de Model-->
+                @Html.ValidationMessageFor(m => m.Email)
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+                <label for="name">Message</label>
+                <!--textbox usa el atributo nombre del modelo, usa Html para darle la clase form.control-->
+                @Html.TextAreaFor(m => m.Message, new { @class = "form-control", placeholder = "Message", rows = "6" })
+                <!--validacion que traigo de Model-->
+                @Html.ValidationMessageFor(m => m.Message)
+            </div>
+        </div>
+        <br />
+        <div class="form-group">
+            <!-- Submit Button, le pòngo la clase contact-submit que luego hago referencia desde js contactForm.js-->
+            <button type="submit" class="btn btn-primary contact-submit" id="sendMessageButton">Send</button>
+
+        </div>
+
+
+
+    }
+</div>
+<!--..................................................................................-->
+<div id="form-result">
+
+</div>
+
+

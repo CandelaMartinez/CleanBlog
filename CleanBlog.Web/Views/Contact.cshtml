@@ -1,0 +1,35 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+
+@using ClientDependency.Core.Mvc
+
+
+@{
+    Layout = "Master.cshtml";
+
+    //decirle que use los js files and client side validation
+
+    Html.EnableClientValidation();
+    Html.EnableUnobtrusiveJavaScript();
+
+    Html.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js");
+    Html.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js");
+    Html.RequiresJs("/scripts/jquery.validate.min.js");
+    Html.RequiresJs("/scripts/jquery.validate.unobtrusive.min.js");
+    Html.RequiresJs("/scripts/jquery.unobtrusive-ajax.min.js");
+    Html.RequiresJs("/scripts/contactForm.js");
+
+}
+
+
+@Html.Partial("~/Views/Partials/Header.cshtml")
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+            <!--llamo al metodo renderform2 del controlador contactSurface, devuelve la partial view del model, recibiendo el model como parametro, ya tiene configurado el id-->
+            @{ Html.RenderAction("RenderForm", "ContactSurface"); }
+        </div>
+    </div>
+
+</div>

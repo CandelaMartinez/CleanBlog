@@ -1,0 +1,14 @@
+﻿{
+    "gridEditors": [
+        {
+            "name": "Code",
+            "alias": "code",
+            "view": "/App_Plugins/GridPropio/editor.html",
+            "icon": "icon-code",
+            "config": {
+                "color": "red",
+                "text-align": "right"
+            }
+        }
+    ]
+}

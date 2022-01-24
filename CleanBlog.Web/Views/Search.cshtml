@@ -1,0 +1,65 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<Umbraco.Web.PublishedModels.Search>
+@{
+    Layout = "Master.cshtml";
+    //piso que busque en request: q, el input tiene el nombre de q asi que buscara alli 
+    var searchQuery = Request.QueryString["q"];
+
+
+}
+
+<!-- Page Header-->
+@Html.Partial("~/Views/Partials/Header.cshtml")
+
+<div class="container">
+    <form action="@Model.Url" method="GET" id="search">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <div class="form-group controls">
+                    <input type="text" class="form-control col-xs-6" placeholder=@Umbraco.GetDictionaryValue("Search.Placeholder") name="q" value="" />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="form-group">
+                <button class="btn btn-primary search-button">@Umbraco.GetDictionaryValue("Search.Placeholder") <i class="fa fa-search"></i></button>
+            </div>
+        </div>
+
+        <div class="col-lg-8 col-md-10 max-auto">
+
+            <!--si searchQuery no es null: results es el resultado de la busqueda searchQuery-->
+            @if (!string.IsNullOrWhiteSpace(searchQuery)){
+                var results = Umbraco.ContentQuery.Search(searchQuery, string.Empty);
+
+                //si results no es null y hay alguno, cuentalos, sino pon 0
+                long resultCount = results != null && results.Any() ? results.Count() : 0;
+                <p>Tu busqueda obtuvo @resultCount resultado/s.</p>
+
+                <!--recorro los resultados, muestro la url y el nombre-->
+                if (resultCount > 0)
+                {
+                    foreach (var result in results)
+                    {
+                        var title = result.Content.Value<string>("titleP");
+                        var subtitle = result.Content.Value<string>("subtitleP");
+                        <div class="post-preview">
+                            <a href="@result.Content.Url">
+                                <h2>@(!string.IsNullOrWhiteSpace(title) ? title : result.Content.Name)</h2>
+                                
+                                @if (!string.IsNullOrWhiteSpace(subtitle))
+                        {
+                            <h3>@subtitle</h3>
+                        }
+
+                            </a>
+                        </div>
+                    }
+            }
+
+            }
+        </div>
+    </form>
+
+</div>
+

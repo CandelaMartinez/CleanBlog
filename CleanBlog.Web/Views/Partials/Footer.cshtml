@@ -1,0 +1,53 @@
+﻿@using Umbraco.Web.Models
+@inherits UmbracoViewPage
+
+@{
+
+    //accedo a mi homepage con o sin Model builder
+    var homePage = Model.AncestorOrSelf<Home>();
+    // var homePage = Model.AncestorOrSelf("Home");
+
+    //accedo a la lista de nested content de socialLinkP
+    var socialLinks = homePage.Value<IEnumerable<IPublishedElement>>("socialLinksP");
+
+}
+
+<hr>
+<!-- Footer-->
+<footer class="border-top">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <!--si socialLink no es null y tiene contenido-->
+                @if (socialLinks != null && socialLinks.Any())
+                {
+                    <ul class="list-inline text-center">
+                        @foreach (var item in socialLinks)
+                        {
+                            //accedo a las propiedades dentro de cada item de  la lista de socialLink
+                            var link = item.Value<Link>("linkP");
+                            var iconClass = item.Value<string>("iconClassP");
+
+
+                            <li class="list-inline-item">
+                                <!--accedo a la url y la abro en otra pestaña-->
+                                <a href="@link.Url" target="@link.Target">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fas fa-circle fa-stack-2x"></i>
+                                        <i class="@iconClass fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                        }
+
+                 
+                    </ul>
+
+                }
+
+                <!--el copyright lo defini en backoffice, en traslation, donde puedo guardar valores que llamo desde aqui para que no sean hardcoded-->
+                <div class="small text-center text-muted fst-italic">Copyright &copy; @Umbraco.GetDictionaryValue("Footer.CopyrightName")</div>
+            </div>
+        </div>
+    </div>
+</footer>
